@@ -1,0 +1,68 @@
+.container {
+  background: #fff;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.buttons button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.stopBtn {
+  background: #ff3860;
+  color: #fff;
+}
+
+.uploadBtn {
+  background: #4968f1;
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grid strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.grid p {
+  margin: 0.25rem 0 0;
+}
+
+.linked strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.videoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.viewBtn {
+  background: #4968f1;
+  color: #fff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}

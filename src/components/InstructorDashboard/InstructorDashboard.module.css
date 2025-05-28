@@ -1,0 +1,195 @@
+:root {
+  --bg:     #f5f7fa;
+  --white:  #ffffff;
+  --border: #ececec;
+  --shadow: rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+
+
+.container {
+  padding: 2rem 11em;
+  display: grid;
+  grid-template-columns: 485px 1fr;    /* left panel fixed, right fluid */
+  height: calc(100% - 64px);           /* subtract header height */
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.sidebar {
+  /* width is driven by the grid column above */
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+/* force every direct child of .sidebar to span full 340px */
+.sidebar > * {
+  width: 100%;
+}
+
+/* —————————— “Nieuwe Les Starten” panel —————————— */
+.newLesson {
+  background: var(--white);
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.newLesson h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.startBtn {
+  margin-top: 0.5rem;
+  width: 100%;
+  background: #00d084;
+  color: var(--white);
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.startBtn:disabled {
+  background: #ccc;
+  cursor: default;
+}
+.startBtn:not(:disabled):hover {
+  filter: brightness(0.9);
+}
+
+/* —————————— Lessons Panel —————————— */
+.panel {
+  background: var(--white);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg);
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.75rem 0;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.tabs button.active {
+  background: var(--white);
+  border-bottom: 2px solid #4968f1;
+  font-weight: bold;
+}
+
+.content {
+  padding: 1rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.item.selected {
+  background: #e8f0fe;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badgeActive {
+  background: #00d084;
+  color: var(--white);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.badgeDone {
+  background: var(--border);
+  color: #333;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.count {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+/* —————————— Main & Empty State —————————— */
+.main {
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  font-size: 1.2rem;
+  background: var(--white);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+/* —————————— Video Section (Right) —————————— */
+.videoSection {
+  background: var(--white);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.videoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.newVideoBtn {
+  background: #4968f1;
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.newVideoBtn:hover {
+  background: #3f5ecc;
+}

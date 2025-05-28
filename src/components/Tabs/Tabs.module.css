@@ -1,0 +1,26 @@
+.tabs {
+  display: flex;
+  border-bottom: 2px solid var(--gray-light);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: var(--gray-medium);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text-dark);
+}
+
+.active {
+  color: var(--purple);
+  border-bottom: 2px solid var(--purple);
+  font-weight: 500;
+  background-color: rgba(192, 208, 255, 0.918);
+}

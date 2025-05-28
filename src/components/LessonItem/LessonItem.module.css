@@ -1,0 +1,61 @@
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--white);
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid grey
+}
+
+.item:hover {
+  background: #fafbfc;
+}
+
+.active {
+  border-left: 4px solid var(--purple);
+}
+
+/* Left section: date + time */
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.date {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.time {
+  font-size: 0.85rem;
+  color: var(--gray-medium);
+}
+
+/* Right section: video count + arrow */
+.meta {
+  display: flex;
+  align-items: center;
+}
+
+/* Video icon + number */
+.videos {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--gray-medium);
+  margin-right: 1rem;
+}
+
+.videoIcon {
+  margin-right: 0.25rem;
+  color: var(--purple);
+}
+
+/* Chevron */
+.arrow {
+  color: var(--gray-medium);
+}

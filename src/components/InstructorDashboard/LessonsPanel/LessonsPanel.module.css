@@ -1,0 +1,94 @@
+/* src/components/InstructorDashboard/LessonsPanel/LessonsPanel.module.css */
+
+.panel {
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  background: #f4f8fa;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: white;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.tabs button.active {
+  color: var(--purple);
+  border-bottom: 2px solid var(--purple);
+  font-weight: 500;
+  background-color: rgba(192, 208, 255, 0.918);
+}
+
+.content {
+  padding: 1rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.item.selected {
+  padding: 8px;
+  background: #e8f0fe;
+  border-radius: 5px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badgeActive {
+  background: #00d084;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.badgeDone {
+  background: #ccc;
+  color: #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+/* FiVideo icon styling */
+.videoIcon {
+  color: var(--purple);
+  margin-right: 0.25rem;
+  font-size: 1rem;
+}
+
+/* FiChevronRight styling */
+.arrow {
+  color: var(--gray-medium);
+  font-size: 1rem;
+}

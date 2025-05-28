@@ -1,0 +1,98 @@
+.panel {
+  background: var(--white);
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+.lessonDate {
+  font-size: 0.9rem;
+  color: var(--gray-medium);
+}
+
+/* Time boxes */
+.times {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+.timeBox {
+  flex: 1;
+}
+.timeBox label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-medium);
+  margin-bottom: 4px;
+}
+.timeValue {
+  background: var(--gray-light);
+  padding: 20px;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Videos section */
+.videosSection {
+  margin-top: 24px;
+}
+.videosLabel {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+/* No videos */
+.noVideos {
+  color: var(--gray-medium);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Each video card */
+.videoCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  padding: 16px 16px;
+  margin-bottom: 12px;
+}
+.timestamp {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+.viewBtn {
+  background: var(--purple);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.viewBtn:hover {
+  background: #5a4bcf;
+}
+
+/* Placeholder */
+.placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-medium);
+}

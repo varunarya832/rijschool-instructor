@@ -1,0 +1,6 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  /* no flex:1 or overflow here */
+}
