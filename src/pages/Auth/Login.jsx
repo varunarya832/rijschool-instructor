@@ -15,7 +15,7 @@ export default function Login() {
     setError('');
     try {
       await login({ email, password });
-      navigate('/dashboard', { replace: true });
+      navigate('/instructor/dashboard', { replace: true });
     } catch (e) {
       console.log(e);
       
