@@ -83,19 +83,19 @@ export default function LessonDetail({ lesson, onStop, onUpload, onVideoView }) 
       </div>
       
       <div className={styles.grid}>
-        <div>
+        <div  className={styles.lessonInfo}>
           <strong>Leerling</strong>
           <p>{lesson.studentName}</p>
         </div>
-        <div>
+        <div className={styles.lessonInfo}>
           <strong>Datum</strong>
           <p>{formatDate(lesson.date)}</p>
         </div>
-        <div>
+        <div className={styles.lessonInfo}>
           <strong>Starttijd</strong>
           <p>{formatTime(lesson.startTime)}</p>
         </div>
-        <div>
+        <div className={styles.lessonInfo}>
           <strong>Eindtijd</strong>
           <p>{lesson.endTime ? formatTime(lesson.endTime) : 'Nog niet beëindigd'}</p>
         </div>
