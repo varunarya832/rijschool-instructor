@@ -230,7 +230,6 @@ export default function InstructorDashboard() {
     navigate('/login', { replace: true });
   };
 
-  // Determine which lesson to show in detail
   const lessonToShow = activeLesson || selectedCompletedLesson;
 
   return (

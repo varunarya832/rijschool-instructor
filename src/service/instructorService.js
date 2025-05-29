@@ -1,4 +1,3 @@
-// instructorService.js - Updated functions
 import { BASE_URL } from "../constants";
 import { fetchAPI } from "./api";
 import { handleResponse } from "./handleResponse";
