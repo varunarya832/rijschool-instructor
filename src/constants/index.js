@@ -1,1 +1,1 @@
-export const BASE_URL = "https://90ea-2405-201-801d-8863-3d20-5eaf-7f8c-5963.ngrok-free.app";
+export const BASE_URL = "https://1178-150-242-150-1.ngrok-free.app";

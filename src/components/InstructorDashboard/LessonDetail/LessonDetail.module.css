@@ -66,3 +66,9 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.Label{
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+}

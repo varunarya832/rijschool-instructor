@@ -1,4 +1,4 @@
-// src/components/InstructorDashboard/LessonsPanel/LessonsPanel.jsx
+
 import React, { useState } from 'react';
 import { FiChevronRight, FiVideo } from 'react-icons/fi';
 import styles from './LessonsPanel.module.css';
@@ -9,8 +9,60 @@ export default function LessonsPanel({
   selectedLesson,
   onSelectLesson
 }) {
-  const [tab, setTab] = useState('active'); // 'active' or 'completed'
+  const [tab, setTab] = useState('active');
   const list = tab === 'active' ? activeLessons : completedLessons;
+
+  const formatEntry = (lesson) => {
+    const { date, startTime, endTime } = lesson;
+    
+    // Handle date formatting - check if it's already a string or needs parsing
+    let dateStr;
+    if (typeof date === 'string') {
+      // If date is a string like "2025-05-26", format it
+      const d = new Date(date);
+      dateStr = d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric'
+      });
+    } else {
+      // If date is already formatted or a Date object
+      dateStr = date;
+    }
+
+    // Format times - handle both "HH:MM" string format and full datetime strings
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '';
+      
+      // If it's just "HH:MM" format
+      if (timeStr.match(/^\d{2}:\d{2}$/)) {
+        const [hours, minutes] = timeStr.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        return `${displayHour}:${minutes} ${ampm}`;
+      }
+      
+      // If it's a full datetime string, extract time
+      try {
+        const d = new Date(timeStr);
+        return d.toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          hour12: true 
+        });
+      } catch (e) {
+        return timeStr; // Return as-is if parsing fails
+      }
+    };
+
+    const startStr = formatTime(startTime);
+    if (!endTime) {
+      return `${dateStr} – ${startStr}`;
+    }
+    const endStr = formatTime(endTime);
+    return `${dateStr} – ${startStr} tot ${endStr}`;
+  };
 
   return (
     <div className={styles.panel}>
@@ -38,17 +90,18 @@ export default function LessonsPanel({
               <li
                 key={les.id}
                 className={`${styles.item} ${
-                  selectedLesson && selectedLesson.id === les.id
-                    ? styles.selected
-                    : ''
+                  selectedLesson?.id === les.id ? styles.selected : ''
                 }`}
                 onClick={() => onSelectLesson(les)}
               >
                 <div>
-                  {les.studentName}
-                  <br />
-                  {new Date(`${les.date}T${les.startTime}`).toLocaleString()}
-                  {tab === 'completed' && les.endTime && ` tot ${les.endTime}`}
+                  {tab === 'completed' && (
+                    <>
+                      <strong>{les.studentName}</strong>
+                      <br />
+                    </>
+                  )}
+                  {formatEntry(les)}
                 </div>
 
                 <div className={styles.meta}>
@@ -65,11 +118,10 @@ export default function LessonsPanel({
                   {tab === 'completed' && (
                     <span className={styles.count}>
                       <FiVideo className={styles.videoIcon} />
-                      {les.linkedVideosCount || 0}
+                      {les.linkedVideosCount}
                     </span>
                   )}
 
-                  {/* right‐arrow indicator */}
                   <FiChevronRight className={styles.arrow} />
                 </div>
               </li>

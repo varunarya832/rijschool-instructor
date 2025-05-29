@@ -1,10 +1,9 @@
-
+// instructorService.js - Updated functions
 import { BASE_URL } from "../constants";
 import { fetchAPI } from "./api";
 import { handleResponse } from "./handleResponse";
 
 let activeLessons = [];
-let completedLessons = [];
 let videos = [
   { id: 'v1', timestamp: '2025-05-26T16:53:00' },
   { id: 'v2', timestamp: '2025-05-26T16:43:00' },
@@ -15,60 +14,31 @@ let videos = [
 
 export async function getStudents() {
   const options = { method: "GET", redirect: "follow" };
-  try {
-    const response = await fetchAPI(`${BASE_URL}/api/instructor/students`, options);
-    const result = await handleResponse(response);
-    if (!result.success) throw new Error(result.message || "Failed to fetch students");
-    const arr = result.data?.data;
-    if (!Array.isArray(arr) || arr.length === 0) {
-      throw new Error("No students found");
-    }
-    return arr;
-  } catch (err) {
-    console.error("Error fetching students:", err.message);
-    throw err;
+  const response = await fetchAPI(`${BASE_URL}/api/instructor/students`, options);
+  const result = await handleResponse(response);
+  if (!result.success) throw new Error(result.message || "Failed to fetch students");
+  const arr = result.data?.data;
+  if (!Array.isArray(arr) || arr.length === 0) {
+    throw new Error("No students found");
   }
+  return arr;
 }
 
 export async function getActiveLessons() {
-  // shallow-copy so callers can’t mutate our internal array
   return [...activeLessons];
 }
 
-export async function getCompletedLessons() {
-  return [...completedLessons];
-}
-
 export async function getUnlinkedVideos() {
-  const options = { method: "GET", redirect: "follow" };
-  try {
-    const response = await fetchAPI(`${BASE_URL}/api/instructor/lessons`, options);
-    const result = await handleResponse(response);
-    if (!result.success) throw new Error(result.message || "Failed to fetch lessons");
-    const lessonsArray = result.data?.data;
-    if (!Array.isArray(lessonsArray) || lessonsArray.length === 0) {
-      throw new Error("No lessons found");
-    }
-    return lessonsArray.map(lesson => ({
-      id: lesson.id,
-      videos: lesson.videos,
-      date: new Date(lesson.date),
-      start: new Date(lesson.start_time),
-      end: new Date(lesson.end_time),
-    }));
-  } catch (err) {
-    console.error("Error fetching lessons:", err.message);
-    throw err;
-  }
+  return [];
 }
 
 export async function startLesson(studentId, studentName) {
   const now = new Date();
   const lesson = {
-    id:studentId ,
+    id: studentId,
     studentId,
     studentName,
-    date: now.toISOString().split('T')[0],
+    date: now.toISOString().split("T")[0],
     startTime: now.toTimeString().slice(0, 5),
     endTime: null,
     linkedVideos: [],
@@ -80,13 +50,12 @@ export async function startLesson(studentId, studentName) {
 export async function stopLesson(lessonId) {
   const idx = activeLessons.findIndex(l => l.id === lessonId);
   if (idx === -1) throw new Error(`No active lesson found with id ${lessonId}`);
-
   const lesson = activeLessons[idx];
   const now = new Date();
   lesson.endTime = now.toTimeString().slice(0, 5);
 
   const formattedDate = now.toLocaleDateString("en-GB", {
-    day: 'numeric', month: 'long', year: 'numeric'
+    day: "numeric", month: "long", year: "numeric"
   });
   const formattedStart = `${formattedDate} ${lesson.startTime}`;
   const formattedEnd = `${formattedDate} ${lesson.endTime}`;
@@ -105,47 +74,80 @@ export async function stopLesson(lessonId) {
     redirect: "follow",
   };
 
+  const response = await fetchAPI(`${BASE_URL}/api/instructor/update_lesson`, options);
+  const result = await handleResponse(response);
+  if (!result.success) throw new Error(result.message || "Failed to stop lesson");
+
+  activeLessons = [];
+  return lesson;
+}
+
+/**
+ * Fetch completed lessons for the given student with proper student name mapping
+ */
+export async function getCompletedLessons(studentId) {
+  if (!studentId) return [];
+  const options = { method: "GET", redirect: "follow", noAuth: true };
+  const url = `${BASE_URL}/api/lessons?student_id=${studentId}`;
+  const response = await fetchAPI(url, options);
+  const result = await handleResponse(response);
+  if (!result.success) throw new Error(result.message || "Failed to fetch completed lessons");
+
+  const lessonsArray = result.data?.data || [];
+  
+  // Get students to map student names properly
+  const students = await getStudents();
+  
+  return lessonsArray.map(lesson => {
+    // Find the student name from the students array
+    const student = students.find(s => s.id === lesson.student_id);
+    
+    return {
+      id: lesson.id,
+      studentId: lesson.student_id,
+      studentName: student ? student.name : 'Unknown Student',
+      date: lesson.date, // Keep as string for now
+      startTime: lesson.start_time,
+      endTime: lesson.end_time,
+      linkedVideosCount: Array.isArray(lesson.videos)
+        ? lesson.videos.length
+        : lesson.videos || 0
+    };
+  });
+}
+
+/**
+ * NEW FUNCTION: Get lesson details by lesson ID
+ */
+export async function getLessonDetails(lessonId) {
+  const options = { method: "GET", redirect: "follow" };
+  const url = `${BASE_URL}/api/lessons_details?id=${lessonId}`;
+  
   try {
-    const response = await fetchAPI(`${BASE_URL}/api/instructor/update_lesson`, options);
+    const response = await fetchAPI(url, options);
     const result = await handleResponse(response);
+    
     if (!result.success) {
-      throw new Error(result.message || "Failed to stop lesson");
+      throw new Error(result.message || "Failed to fetch lesson details");
     }
-
-    completedLessons = [
-      {
-        id: lesson.id,
-        studentId: lesson.studentId,
-        studentName: lesson.studentName,
-        date: lesson.date,
-        startTime: lesson.startTime,
-        endTime: lesson.endTime,
-        linkedVideosCount: lesson.linkedVideos.length,
-      },
-      ...completedLessons,
-    ];
-    activeLessons = [];
-
-    // return the local lesson object, so your component
-    // can pick out id, studentId, studentName, date, startTime, endTime, and linkedVideos
-    return lesson;
-  } catch (err) {
-    console.error("Error stopping lesson:", err.message);
-    throw err;
+    
+    // Debug: Log the raw result to understand the API response structure
+    console.log('Raw lesson details result:', result);
+    
+    return result.data || result;
+  } catch (error) {
+    console.error('API call failed for lesson details:', error);
+    throw error;
   }
 }
 
 export async function linkVideoToLesson(lessonId, videoObj) {
-  // no global mock array any more—
-  // if you have a backend endpoint for linking, call it here.
-  // otherwise just return the passed-through object so the UI can splice it in.
   return videoObj;
 }
 
 export async function uploadVideoToLesson(lessonId, file) {
   const lesson = activeLessons.find(l => l.id === lessonId);
   if (!lesson) throw new Error(`Active lesson not found: ${lessonId}`);
-
   const newVid = {
     id: 'v' + Date.now(),
     timestamp: new Date().toISOString(),
