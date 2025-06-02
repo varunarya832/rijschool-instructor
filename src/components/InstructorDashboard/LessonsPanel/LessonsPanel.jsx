@@ -97,7 +97,7 @@ export default function LessonsPanel({
                 <div>
                   {tab === 'completed' && (
                     <>
-                      <strong>{les.studentName}</strong>
+                      {/* <strong>{les.studentName}</strong> */}
                       <br />
                     </>
                   )}

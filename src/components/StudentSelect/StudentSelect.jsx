@@ -7,11 +7,17 @@ export default function StudentSelect({ students, value, onChange }) {
       className={styles.select}
       value={value ? value.id : ''}
       onChange={e => {
-        const s = students.find(x => x.id === e.target.value);
-        onChange(s || null);
+        if (e.target.value === 'all') {
+          onChange({ id: 'all', name: 'Alle Lessen' });
+        } else {
+          const s = students.find(x => x.id === e.target.value);
+          onChange(s || null);
+        }
       }}
     >
       <option value="">-- Selecteer een leerling --</option>
+      <option value="all">-- Alle Lessen --</option>
+
       {students.map(s => (
         <option key={s.id} value={s.id}>
           {s.name}
