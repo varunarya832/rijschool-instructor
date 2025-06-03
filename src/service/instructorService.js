@@ -50,20 +50,19 @@ export async function stopLesson(lessonId) {
   const idx = activeLessons.findIndex(l => l.id === lessonId);
   if (idx === -1) throw new Error(`No active lesson found with id ${lessonId}`);
   const lesson = activeLessons[idx];
-  const now = new Date();
-  lesson.endTime = now.toTimeString().slice(0, 5);
 
-  const formattedDate = now.toLocaleDateString("en-GB", {
-    day: "numeric", month: "long", year: "numeric"
-  });
-  const formattedStart = `${formattedDate} ${lesson.startTime}`;
-  const formattedEnd = `${formattedDate} ${lesson.endTime}`;
+  const now = new Date();
+
+
+  const endTimeUtcIso = now.toISOString(); 
+  const utcDateOnly = now.toISOString().slice(0, 10); 
+  lesson.endTime = endTimeUtcIso; 
 
   const body = {
     student_id: lesson.studentId,
-    start_time: formattedStart,
-    end_time: formattedEnd,
-    date: formattedDate,
+    start_time: lesson.startTime,
+    end_time: endTimeUtcIso,
+    date: utcDateOnly
   };
 
   const options = {
@@ -80,6 +79,7 @@ export async function stopLesson(lessonId) {
   activeLessons = [];
   return lesson;
 }
+
 
 /**
  * Fetch completed lessons for the given student with proper student name mapping
