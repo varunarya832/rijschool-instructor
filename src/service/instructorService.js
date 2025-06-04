@@ -47,36 +47,23 @@ export async function startLesson(studentId, studentName) {
 }
 
 export async function stopLesson(lessonId) {
-  // 1) Find the active lesson
   const idx = activeLessons.findIndex(l => l.id === lessonId);
   if (idx === -1) throw new Error(`No active lesson found with id ${lessonId}`);
   const lesson = activeLessons[idx];
 
-  // 2) Get current time for “end_time”
   const now = new Date();
 
-  // 3) Compute UTC ISO string for end_time
-  const endTimeUtcIso = now.toISOString(); // e.g. "2025-06-03T07:15:30.000Z"
+  const endTimeUtcIso = now.toISOString(); 
 
-  // 4) Reconstruct the lesson’s original start as a local Date,
-  //    then convert that to UTC ISO as well.
-  //
-  //    We assume lesson.date is "YYYY-MM-DD" (local date for the lesson)
-  //    and lesson.startTime is "HH:MM" (local start time).
   const [year, month, day] = lesson.date.split('-').map(Number);
   const [startHour, startMinute] = lesson.startTime.split(':').map(Number);
   const localStart = new Date(year, month - 1, day, startHour, startMinute);
-  const startTimeUtcIso = localStart.toISOString(); // e.g. "2025-06-03T05:45:00.000Z"
+  const startTimeUtcIso = localStart.toISOString(); 
 
-  // 5) If you still want to store endTime locally for UI, you can:
   lesson.endTime = endTimeUtcIso;
-  //    (Optionally overwrite lesson.startTime with its UTC ISO:
-  //     lesson.startTime = startTimeUtcIso; )
+ 
+  const utcDateOnly = now.toISOString().slice(0, 10);
 
-  // 6) Build a UTC date string (YYYY-MM-DD) based on “now”
-  const utcDateOnly = now.toISOString().slice(0, 10); // e.g. "2025-06-03"
-
-  // 7) Construct the payload using both UTC timestamps
   const body = {
     student_id: lesson.studentId,
     start_time: startTimeUtcIso,
@@ -91,12 +78,10 @@ export async function stopLesson(lessonId) {
     redirect: "follow",
   };
 
-  // 8) Send the update to the server
   const response = await fetchAPI(`${BASE_URL}/api/instructor/update_lesson`, options);
   const result = await handleResponse(response);
   if (!result.success) throw new Error(result.message || "Failed to stop lesson");
 
-  // 9) Clear activeLessons and return the updated lesson
   activeLessons = [];
   return lesson;
 }
