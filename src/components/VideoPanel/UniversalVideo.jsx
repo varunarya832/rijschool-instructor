@@ -48,7 +48,7 @@ export default function UniversalVideo({
       controls
       playsInline
       webkit-playsinline="true"
-      crossOrigin="anonymous"
+    //   crossOrigin="anonymous"
       muted={autoPlay}
       autoPlay={autoPlay}
       onEnded={onEnded}
