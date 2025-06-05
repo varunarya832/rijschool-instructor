@@ -18,7 +18,6 @@ export default function Login() {
       navigate('/instructor/dashboard', { replace: true });
     } catch (e) {
       console.log(e);
-      
       setError('Ongeldige gebruikersnaam of wachtwoord.');
     }
   };
