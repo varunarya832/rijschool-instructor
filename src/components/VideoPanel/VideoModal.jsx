@@ -62,7 +62,7 @@ const VideoModal = ({ video, onClose }) => {
   console.log(video);
   
   // const videoData = video.url;
-  const videoData = "https://www.pexels.com/video/laboratory-medical-medicine-virus-4114797/";
+  const videoData = "https://videocdn.cdnpk.net/videos/f7d66bb4-4b0a-4897-996d-7c3510ae3c54/horizontal/previews/clear/large.mp4?token=exp=1749129067~hmac=96236b7c1dbe3a665b096b4056fc58b9ed8d9667d198a492e3744b9d9eacfb42";
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
