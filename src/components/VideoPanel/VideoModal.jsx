@@ -1,102 +1,47 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ReactPlayer from 'react-player';
+import React, { useState, useEffect } from 'react';
 import styles from './VideoModal.module.css';
 
 const VideoModal = ({ video, onClose }) => {
-  const [useNativePlayer, setUseNativePlayer] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [playerError, setPlayerError] = useState(false);
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    // Detect iOS devices more comprehensively
-    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    setIsIOS(iOS);
-    
-    // Start with native player on iOS for better compatibility
-    if (iOS) {
-      setUseNativePlayer(true);
-    }
-  }, []);
+  const [showVideo, setShowVideo] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   if (!video) return null;
-  
+
   const videoData = video.url;
 
-  const handlePlayerError = (error) => {
-    console.error('ReactPlayer error:', error);
-    setPlayerError(true);
-    setUseNativePlayer(true);
+  // Simple click handler to enable video on iOS
+  const handlePlayClick = () => {
+    setUserInteracted(true);
+    setShowVideo(true);
   };
 
-  const handleVideoError = (e) => {
-    console.error('Native video error:', e);
-    // You might want to show an error message to user here
-  };
-
-  const renderVideoPlayer = () => {
-    if (!videoData) {
-      return (
-        <img
-          src={video.imageUrl}
-          alt="snapshot"
-          className={styles.videoImage}
-        />
-      );
+  // Open video in new tab/window for mobile
+  const openVideoExternal = () => {
+    // For mobile, open in new window which often works better
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Video Player</title>
+          <style>
+            body { margin: 0; padding: 0; background: #000; }
+            video { width: 100vw; height: 100vh; object-fit: contain; }
+          </style>
+        </head>
+        <body>
+          <video controls autoplay playsinline webkit-playsinline="true">
+            <source src="${videoData}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
     }
-
-    // Option 1: Enhanced ReactPlayer with iOS-specific config
-    if (!useNativePlayer && !playerError) {
-      return (
-        <ReactPlayer
-          ref={videoRef}
-          url={videoData}
-          controls
-          width="100%"
-          height="100%"
-          className={styles.reactPlayer}
-          onError={handlePlayerError}
-          // iOS specific configurations
-          config={{
-            file: {
-              attributes: {
-                controlsList: 'nodownload',
-                playsInline: true, // Crucial for iOS
-                preload: 'metadata',
-                'webkit-playsinline': true, // Legacy iOS support
-                // crossOrigin: 'anonymous', // If videos are cross-origin
-              }
-            }
-          }}
-          // Force reload on iOS if needed
-          key={isIOS ? `ios-${videoData}` : videoData}
-          playsinline={true} // ReactPlayer prop for iOS
-        />
-      );
-    }
-
-    // Option 2: Native HTML5 video element as fallback
-    return (
-      <video
-        ref={videoRef}
-        src={videoData}
-        controls
-        className={styles.nativeVideo}
-        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-        playsInline
-        webkit-playsinline="true"
-        preload="metadata"
-        controlsList="nodownload"
-        onError={handleVideoError}
-        crossOrigin="anonymous"
-      >
-        <source src={videoData} type="video/mp4" />
-        <source src={videoData} type="video/webm" />
-        <source src={videoData} type="video/ogg" />
-        Your browser does not support the video tag.
-      </video>
-    );
   };
 
   return (
@@ -108,27 +53,68 @@ const VideoModal = ({ video, onClose }) => {
         <div className={styles.header}>
           <span className={styles.timestamp}>{video.timestamp}</span>
           <span className={styles.analysisLabel}>AI Analyse</span>
-          {isIOS && (
-            <button 
-              className={styles.togglePlayer}
-              onClick={() => setUseNativePlayer(!useNativePlayer)}
-              style={{ 
-                fontSize: '12px', 
-                padding: '4px 8px', 
-                marginLeft: '10px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px'
-              }}
-            >
-              {useNativePlayer ? 'Try ReactPlayer' : 'Use Native Player'}
-            </button>
-          )}
         </div>
         <div className={styles.body}>
           <div className={styles.videoContainer}>
-            {renderVideoPlayer()}
+            {!showVideo ? (
+              // Show thumbnail with play button
+              <div className={styles.thumbnailContainer}>
+                <img
+                  src={video.imageUrl}
+                  alt="Video thumbnail"
+                  className={styles.thumbnail}
+                />
+                <div className={styles.playOverlay}>
+                  <button 
+                    className={styles.playButton}
+                    onClick={handlePlayClick}
+                  >
+                    <div className={styles.playIcon}>▶</div>
+                    <span>Play Video</span>
+                  </button>
+                  <button 
+                    className={styles.externalButton}
+                    onClick={openVideoExternal}
+                  >
+                    Open in New Tab
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Show actual video player
+              <div className={styles.videoPlayer}>
+                <video
+                  controls
+                  autoPlay
+                  playsInline
+                  webkit-playsinline="true"
+                  className={styles.video}
+                  poster={video.imageUrl}
+                >
+                  <source src={videoData} type="video/mp4" />
+                  <p>
+                    Your browser doesn't support HTML5 video. 
+                    <a href={videoData} target="_blank" rel="noopener noreferrer">
+                      Click here to view the video
+                    </a>
+                  </p>
+                </video>
+                <div className={styles.videoControls}>
+                  <button 
+                    className={styles.backButton}
+                    onClick={() => setShowVideo(false)}
+                  >
+                    ← Back to Thumbnail
+                  </button>
+                  <button 
+                    className={styles.externalButton}
+                    onClick={openVideoExternal}
+                  >
+                    Open Externally
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           <div className={styles.analysisContainer}>
           </div>
@@ -139,68 +125,3 @@ const VideoModal = ({ video, onClose }) => {
 };
 
 export default VideoModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from 'react';
-// import ReactPlayer from 'react-player';
-// import styles from './VideoModal.module.css';
-// import UniversalVideo from './UniversalVideo';
-
-// const VideoModal = ({ video, onClose }) => {
-//   if (!video) return null;
-
-//   const videoData = video.url; // e.g. "https://…/myclip.mp4"
-
-//   return (
-//     <div className={styles.overlay}>
-//       <div className={styles.modal}>
-//         <button className={styles.closeBtn} onClick={onClose}>×</button>
-
-//         <div className={styles.header}>
-//           <span className={styles.timestamp}>{video.timestamp}</span>
-//           <span className={styles.analysisLabel}>AI Analyse</span>
-//         </div>
-
-//         <div className={styles.body}>
-//           <div className={styles.videoContainer}>
-//             {videoData ? (
-//               <UniversalVideo
-//                 src={video.url}          // signed MP4 (or M3U8 later)
-//               />
-
-//             ) : (
-//               <img
-//                 src={video.imageUrl}
-//                 alt="snapshot"
-//                 className={styles.videoImage}
-//               />
-//             )}
-//           </div>
-//           <div className={styles.analysisContainer}>
-//             {/* AI analysis content */}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default VideoModal;
