@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
 import styles from './VideoModal.module.css';
+import UniversalVideo from './UniversalVideo';
 
 const VideoModal = ({ video, onClose }) => {
   if (!video) return null;
@@ -20,25 +21,10 @@ const VideoModal = ({ video, onClose }) => {
         <div className={styles.body}>
           <div className={styles.videoContainer}>
             {videoData ? (
-              <ReactPlayer
-                url={videoData}
-                controls
-                // If you want it to start playing as soon as the modal opens:
-                // playing
-                // muted              // (autoplay without muted will be blocked on mobile)
-                width="100%"
-                height="100%"
-                className={styles.reactPlayer}
-                config={{
-                  file: {
-                    attributes: {
-                      playsInline: true,
-                      webkitPlaysInline: true,
-                      // muted: true,      // if you uncomment `playing` above
-                    }
-                  }
-                }}
+              <UniversalVideo
+                src={video.url}          // signed MP4 (or M3U8 later)
               />
+
             ) : (
               <img
                 src={video.imageUrl}
