@@ -5,9 +5,10 @@ import styles from './VideoModal.module.css';
 const VideoModal = ({ video, onClose }) => {
   if (!video) return null;
 
-  const videoData = "https://videocdn.cdnpk.net/videos/571b35e8-4beb-456b-bac3-7231962d0405/horizontal/previews/clear/large.mp4?token=exp=1749139796~hmac=4d56854a5aeafdce2a878e3b08cea728ab62c7b50f0ad4f1354d2dac99e17b45";
-  // const videoData = video.url || null; // Use video.videoUrl if available
-
+  // For demo purposes, we're using a fixed sample video.
+  // In production you would use `video.url`.
+  // const videoData = video.url || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4";
+const videoData = video.url
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
@@ -28,23 +29,24 @@ const VideoModal = ({ video, onClose }) => {
                 controls
                 width="100%"
                 height="100%"
-                playsinline={true}                  // ReactPlayer prop
+                playsinline={true}
                 config={{
                   file: {
                     attributes: {
-                      playsInline: true,            // for modern iOS
-                      webkitPlaysInline: 'true',    // for older iOS
+                      playsInline: true,
+                      webkitplaysinline: 'true',
                     }
                   }
                 }}
+                className={styles.reactPlayer}
               />
             ) : (
-              <p>not</p>
+              <p>Video niet beschikbaar</p>
             )}
           </div>
 
           <div className={styles.analysisContainer}>
-            {/* your AI analysis content will go here */}
+            {/* Placeholder for AI-analyse of de video */}
           </div>
         </div>
       </div>

@@ -1,7 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import StudentSelect from '../StudentSelect/StudentSelect';
 import Header from '../Header/Header';
@@ -9,14 +10,14 @@ import LessonsPanel from './LessonsPanel/LessonsPanel';
 import LessonDetail from './LessonDetail/LessonDetail';
 import VideoList from './VideoList/VideoList';
 import VideoUploadModal from './VideoUploadModal/VideoUploadModal';
-import VideoModal from '../VideoPanel/VideoModal'; // NEW IMPORT
+import VideoModal from '../VideoPanel/VideoModal';
 
 import {
   getStudents,
   getActiveLessons,
   getCompletedLessons,
   getUnlinkedVideos,
-  getLessonDetails, // NEW IMPORT
+  getLessonDetails,
   startLesson,
   stopLesson,
   linkVideoToLesson,
@@ -33,15 +34,30 @@ export default function InstructorDashboard() {
   const [completedLessons, setCompletedLessons] = useState([]);
   const [unlinkedVideos, setUnlinkedVideos] = useState([]);
   const [activeLesson, setActiveLesson] = useState(null);
-  const [selectedCompletedLesson, setSelectedCompletedLesson] = useState(null); // NEW STATE
+  const [selectedCompletedLesson, setSelectedCompletedLesson] = useState(null);
+
   const [showUpload, setShowUpload] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false); // NEW STATE
-  const [selectedVideo, setSelectedVideo] = useState(null); // NEW STATE
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
+  const [isLoadingStudents, setIsLoadingStudents] = useState(false);
+  const [isLoadingActiveLessons, setIsLoadingActiveLessons] = useState(false);
+  const [isLoadingUnlinkedVideos, setIsLoadingUnlinkedVideos] = useState(false);
+  const [isLoadingCompletedLessons, setIsLoadingCompletedLessons] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const [isStopping, setIsStopping] = useState(false);
+  const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+  const [isLinking, setIsLinking] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setIsLoadingStudents(true);
+    setIsLoadingActiveLessons(true);
+    setIsLoadingUnlinkedVideos(true);
+
     Promise.all([
       getStudents(),
       getActiveLessons(),
@@ -53,7 +69,15 @@ export default function InstructorDashboard() {
         if (actLessons.length) setActiveLesson(actLessons[0]);
         setUnlinkedVideos(vids);
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error(error);
+        toast.error('Fout bij laden van initiële gegevens');
+      })
+      .finally(() => {
+        setIsLoadingStudents(false);
+        setIsLoadingActiveLessons(false);
+        setIsLoadingUnlinkedVideos(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -61,26 +85,40 @@ export default function InstructorDashboard() {
       setCompletedLessons([]);
       return;
     }
+    setIsLoadingCompletedLessons(true);
     getCompletedLessons(selectedStudent.id)
       .then(lessonList => {
         setCompletedLessons(lessonList);
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error(error);
+        toast.error('Fout bij laden van voltooide lessen');
+      })
+      .finally(() => {
+        setIsLoadingCompletedLessons(false);
+      });
   }, [selectedStudent]);
 
   const handleStart = () => {
     if (!selectedStudent) return;
+    setIsStarting(true);
     startLesson(selectedStudent.id, selectedStudent.name)
       .then(les => {
         setActiveLessons([les]);
         setActiveLesson(les);
-        setSelectedCompletedLesson(null); // Clear completed lesson selection
+        setSelectedCompletedLesson(null);
+        toast.success('Les gestart!');
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error(error);
+        toast.error('Fout bij starten van de les');
+      })
+      .finally(() => setIsStarting(false));
   };
 
   const handleStop = () => {
     if (!activeLesson) return;
+    setIsStopping(true);
     stopLesson(activeLesson.id)
       .then(finished => {
         setCompletedLessons(prev => [
@@ -93,81 +131,84 @@ export default function InstructorDashboard() {
         ]);
         setActiveLessons([]);
         setActiveLesson(null);
+        toast.success('Les gestopt!');
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error(error);
+        toast.error('Fout bij stoppen van de les');
+      })
+      .finally(() => setIsStopping(false));
   };
 
-  // NEW FUNCTION: Handle completed lesson selection
+
   const handleCompletedLessonSelect = async (lesson) => {
+    setIsFetchingDetails(true);
     try {
       const lessonDetails = await getLessonDetails(lesson.id);
-      
-      // Debug: Log the API response to understand the structure
+      console.log('Fetching details for completed lesson:', lessonDetails);
+
       console.log('API Response:', lessonDetails);
-      
-      // Handle different possible API response structures
+
       let lessonData;
       if (lessonDetails && lessonDetails.lesson) {
         lessonData = lessonDetails.lesson;
       } else if (lessonDetails && lessonDetails.data && lessonDetails.data.lesson) {
         lessonData = lessonDetails.data.lesson;
       } else if (lessonDetails) {
-        lessonData = lessonDetails; // Direct lesson data
+        lessonData = lessonDetails;
       } else {
         throw new Error('Invalid API response structure');
       }
-      
-      // Create a lesson object compatible with LessonDetail component
+
       const detailedLesson = {
         id: lesson.id,
         studentId: lesson.studentId,
         studentName: lesson.studentName,
-        date: lessonData.date || lesson.date, // Fallback to original lesson date
+        date: lessonData.date || lesson.date,
         startTime: lessonData.start_time || lessonData.startTime || lesson.startTime,
         endTime: lessonData.end_time || lessonData.endTime || lesson.endTime,
         linkedVideos: (lessonData.videos || []).map((video, index) => {
-          console.log(video);
-          
-          // Handle different video formats: [video_name, video_url] or {name, url}
+          console.log("--",video);
           if (Array.isArray(video) && video.length >= 2) {
             return {
               id: `video_${index}`,
-              name: video[0], // video_name
-              url: video.video_url,  // video_url
+              name: video[0],
+              url: video[1],
               timestamp: new Date().toISOString()
             };
-          } else if (typeof video === 'object' && video.name && video.url) {
+          } else if (typeof video === 'object' && video.name && (video.url || video.video_url)) {
             return {
               id: `video_${index}`,
-              name: video.name,
-              url: video.video_url,
+              name: video.video_name,
+              url: video.url || video.video_url,
               timestamp: new Date().toISOString()
             };
           } else if (typeof video === 'string') {
             return {
               id: `video_${index}`,
-              name: video,
-              url: video.video_url, // No URL available
+              name: video.video_name,
+              url: null,
               timestamp: new Date().toISOString()
             };
           } else {
             return {
               id: `video_${index}`,
-              name: `Video ${index + 1}`,
-              url: video.video_url,
+              name: video.video_name,
+              url: video.video_url || null,
               timestamp: new Date().toISOString()
             };
           }
         }),
-        isCompleted: true // Flag to identify completed lessons
+        isCompleted: true
       };
-      
+
       setSelectedCompletedLesson(detailedLesson);
-      setActiveLesson(null); // Clear active lesson selection
+      setActiveLesson(null);
     } catch (error) {
       console.error('Error fetching lesson details:', error);
-      
-      // Fallback: Use the original lesson data if API fails
+      toast.error('Fout bij laden van lesdetails');
+
+      // Fallback if the API fails
       const fallbackLesson = {
         id: lesson.id,
         studentId: lesson.studentId,
@@ -175,19 +216,26 @@ export default function InstructorDashboard() {
         date: lesson.date,
         startTime: lesson.startTime,
         endTime: lesson.endTime,
-        linkedVideos: [], // Empty since we couldn't fetch details
+        linkedVideos: [],
         isCompleted: true
       };
-      
       setSelectedCompletedLesson(fallbackLesson);
       setActiveLesson(null);
+    } finally {
+      setIsFetchingDetails(false);
     }
   };
 
+
+  // Link an unlinked video to the active lesson
   const handleLink = videoId => {
     if (!activeLesson) return;
+    setIsLinking(true);
     const vid = unlinkedVideos.find(v => v.id === videoId);
-    if (!vid) return;
+    if (!vid) {
+      setIsLinking(false);
+      return;
+    }
     linkVideoToLesson(activeLesson.id, vid)
       .then(v => {
         setUnlinkedVideos(us => us.filter(x => x.id !== v.id));
@@ -195,17 +243,24 @@ export default function InstructorDashboard() {
           ...al,
           linkedVideos: [...(al.linkedVideos || []), v]
         }));
+        toast.success('Video gekoppeld aan les');
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error(error);
+        toast.error('Fout bij koppelen van video');
+      })
+      .finally(() => setIsLinking(false));
   };
 
-  // NEW FUNCTION: Handle video viewing
+  // View a completed lesson's video in a modal
   const handleVideoView = (video) => {
     setSelectedVideo(video);
     setShowVideoModal(true);
   };
 
+  // Upload a video (either unlinked or directly into the active lesson)
   const handleUpload = file => {
+    setIsUploading(true);
     const fn = activeLesson
       ? () => uploadVideoToLesson(activeLesson.id, file)
       : () => uploadUnlinkedVideo(file);
@@ -217,14 +272,23 @@ export default function InstructorDashboard() {
             ...al,
             linkedVideos: [...(al.linkedVideos || []), v]
           }));
+          toast.success('Video geüpload en gekoppeld aan les');
         } else {
           setUnlinkedVideos(us => [v, ...us]);
+          toast.success('Video geüpload');
         }
       })
-      .catch(console.error)
-      .finally(() => setShowUpload(false));
+      .catch(error => {
+        console.error(error);
+        toast.error('Fout bij uploaden van video');
+      })
+      .finally(() => {
+        setIsUploading(false);
+        setShowUpload(false);
+      });
   };
 
+  // Logout and redirect
   const handleLogout = async () => {
     await logout();
     navigate('/login', { replace: true });
@@ -235,6 +299,7 @@ export default function InstructorDashboard() {
   return (
     <div className={styles.page}>
       <Header title="Instructor Dashboard" onLogout={handleLogout} />
+      <ToastContainer position="top-right" autoClose={3000} />
 
       <div className={styles.container}>
         <aside className={styles.sidebar}>
@@ -243,13 +308,14 @@ export default function InstructorDashboard() {
             students={students}
             value={selectedStudent}
             onChange={setSelectedStudent}
+            loading={isLoadingStudents}
           />
           <button
             className={styles.startBtn}
             onClick={handleStart}
-            disabled={!selectedStudent}
+            disabled={!selectedStudent || isStarting || isLoadingStudents}
           >
-            Les Nu Starten
+            {isStarting ? 'Bezig met starten...' : 'Les Nu Starten'}
           </button>
 
           <LessonsPanel
@@ -258,24 +324,30 @@ export default function InstructorDashboard() {
             selectedLesson={lessonToShow}
             onSelectLesson={(lesson) => {
               if (activeLessons.some(al => al.id === lesson.id)) {
-                // It's an active lesson
                 setActiveLesson(lesson);
                 setSelectedCompletedLesson(null);
               } else {
-                // It's a completed lesson
                 handleCompletedLessonSelect(lesson);
               }
             }}
+            loading={isLoadingActiveLessons || isLoadingCompletedLessons}
           />
         </aside>
 
         <main className={styles.main}>
-          {lessonToShow ? (
+          {isFetchingDetails ? (
+            <div className={styles.loaderCenter}>
+              <div className={styles.loader}></div>
+            </div>
+          ) : lessonToShow ? (
             <LessonDetail
               lesson={lessonToShow}
-              onStop={lessonToShow.isCompleted ? null : handleStop} // Only show stop for active lessons
-              onUpload={lessonToShow.isCompleted ? null : () => setShowUpload(true)} // Only show upload for active lessons
-              onVideoView={handleVideoView} // NEW PROP
+              onStop={lessonToShow.isCompleted ? null : handleStop}
+              onUpload={lessonToShow.isCompleted ? null : () => setShowUpload(true)}
+              onVideoView={handleVideoView}
+              isStopping={isStopping}
+              isUploading={isUploading}
+              selectedStudentName={selectedStudent ? selectedStudent.name : ''}
             />
           ) : (
             <div className={styles.emptyState}>
@@ -283,22 +355,24 @@ export default function InstructorDashboard() {
             </div>
           )}
 
-          <section className={styles.videoSection}>
+          {/* <section className={styles.videoSection}>
             <div className={styles.videoHeader}>
               <h3>Ongekoppelde Video's</h3>
               <button
                 className={styles.newVideoBtn}
                 onClick={() => setShowUpload(true)}
+                disabled={isUploading}
               >
-                Nieuwe Video
+                {isUploading ? 'Bezig met uploaden...' : 'Nieuwe Video'}
               </button>
             </div>
             <VideoList
               videos={unlinkedVideos}
               onView={id => alert(`Bekijk video ${id}`)}
               onLink={handleLink}
+              isLinking={isLinking}
             />
-          </section>
+          </section> */}
         </main>
       </div>
 
@@ -307,6 +381,7 @@ export default function InstructorDashboard() {
           lesson={activeLesson}
           onClose={() => setShowUpload(false)}
           onUpload={handleUpload}
+          isUploading={isUploading}
         />
       )}
 
