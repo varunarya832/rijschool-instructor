@@ -1,0 +1,109 @@
+.sidebar {
+    position: fixed;
+    top: 0; bottom: 0;
+    right: 0;      /* was left: 0 */
+    left: auto;    /* override any left positioning */
+    width: 240px;
+    background: var(--white);
+    box-shadow: -2px 0 8px var(--shadow);  /* invert the shadow */
+    transform: translateX(100%);           /* slide in from the right */
+    transition: transform var(--transition);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+  }
+  
+  .open {
+    transform: translateX(0);
+    right: 0;      /* ensure it pins to the right when open */
+    left: auto;
+  }
+  
+  @media (min-width: 768px) {
+    /* always visible on desktop */
+    .sidebar {
+      transform: translateX(0);
+      right: 0;
+      left: auto;
+    }
+    .closeBtn,
+    .logoutMobile {
+      display: none;
+    }
+  }
+  
+  /* rest unchanged */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid var(--shadow);
+  }
+  
+  .logo {
+    height: 40px;
+  }
+  
+  .closeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .nav {
+    margin-top: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .navItem {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--text);
+    border-radius: 4px;
+    margin: 0 0.5rem;
+    transition: background var(--transition);
+  }
+  
+  .navItem:hover {
+    background: rgba(231, 76, 60, 0.1);
+  }
+  
+  .active {
+    background: var(--primary);
+    color: var(--white);
+  }
+  
+  .icon {
+    margin-right: 0.75rem;
+  }
+  
+  .logoutMobile {
+    display: none;
+  }
+  
+  /* show mobile logout at bottom */
+  @media (max-width: 768px) {
+    .logoutMobile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: red;
+      color: var(--white);
+      border: none;
+      padding: 0.75rem;
+      margin: 1rem;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .logoutMobile:hover {
+      background: rgb(173, 19, 19);;
+    }
+  }
+  

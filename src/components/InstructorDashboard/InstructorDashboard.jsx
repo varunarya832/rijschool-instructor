@@ -11,6 +11,7 @@ import LessonDetail from './LessonDetail/LessonDetail';
 import VideoList from './VideoList/VideoList';
 import VideoUploadModal from './VideoUploadModal/VideoUploadModal';
 import VideoModal from '../VideoPanel/VideoModal';
+import Sidebar from '../Header/Sidebar';
 
 import {
   getStudents,
@@ -49,6 +50,8 @@ export default function InstructorDashboard() {
   const [isFetchingDetails, setIsFetchingDetails] = useState(false);
   const [isLinking, setIsLinking] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -294,12 +297,27 @@ export default function InstructorDashboard() {
     navigate('/login', { replace: true });
   };
 
+  const handleMenuClick = () => {
+    setIsSidebarOpen(true); // Opens the sidebar
+  };
+
+  const handleSidebarClose = () => {
+    setIsSidebarOpen(false); // Closes the sidebar
+  };
+
+
   const lessonToShow = activeLesson || selectedCompletedLesson;
 
   return (
     <div className={styles.page}>
       <Header title="Instructor Dashboard" onLogout={handleLogout} />
+      <Sidebar 
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose} // This closes the sidebar
+        onLogout={handleLogout}
+      />
       <ToastContainer position="top-right" autoClose={3000} />
+      {/* <h1>Instructor Dashboard</h1> */}
 
       <div className={styles.container}>
         <aside className={styles.sidebar}>

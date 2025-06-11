@@ -1,57 +1,67 @@
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem 12rem;
+  justify-content: space-between;
   background: var(--white);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  flex-wrap: wrap; /* allow wrapping on small screens */
+  padding: 0.5rem 2rem;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.menuBtn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.logo {
+  height: 100px;
 }
 
 .title {
   font-size: 1.25rem;
   font-weight: 700;
+  margin: 0;
 }
 
-.logout {
+.logoutDesktop {
   display: flex;
   align-items: center;
-  background: #e74c3c; /* fallback for var(--red) */
+  background: red;
   color: var(--white);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  cursor: pointer;
   font-weight: 700;
-  transition: background 0.2s ease-in-out;
+  transition: background var(--transition);
+  cursor: pointer;
+}
+.logoutDesktop:hover {
+  background: rgb(173, 19, 19);
 }
 
-.logout:hover {
-  background: #c0392b;
-}
-
-.logout img {
-  width: 1rem;
-  margin-right: 0.5rem;
-}
-
-/* Responsive styles */
-@media (max-width: 1024px) {
-  .header {
-    padding: 1rem 4rem;
-  }
-}
-
+/* show menu button & hide desktop-logout on mobile */
 @media (max-width: 768px) {
-  .header {
-    padding: 1rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  .menuBtn {
+    display: block;
   }
-
-  .logout {
-    align-self: flex-end;
-    position: absolute;
+  .logoutDesktop {
+    display: none;
+  }
+  .header {
+    padding: 0.5rem 1rem;
+  }
+  .logo {
+    height: 100px;
+  }
+  .title {
+    display: none; /* optional: hide title for more space */
   }
 }
