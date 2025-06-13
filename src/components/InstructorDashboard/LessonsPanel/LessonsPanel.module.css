@@ -168,6 +168,8 @@
   font-weight: 500;
 }
 
+
+
 .noLessons {
   text-align: center;
   color: #94a3b8;
@@ -434,5 +436,39 @@
   .loadingText,
   .noLessons {
     color: #9ca3af;
+  }
+}
+
+/* new container for title + info */
+.lessonDetails {
+  flex: 1;                      /* take up available space */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;             /* prevent overflow on long names */
+  min-width: 0;                 /* enable proper text-truncation */
+}
+
+/* style for the student’s name */
+.lessonTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;               /* dark slate */
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* adjust mobile slightly */
+@media (max-width: 480px) {
+  .lessonTitle {
+    font-size: 0.9rem;
+  }
+}
+
+/* dark‐mode tweak */
+@media (prefers-color-scheme: dark) {
+  .lessonTitle {
+    color: #e2e8f0;
   }
 }

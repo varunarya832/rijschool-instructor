@@ -9,8 +9,12 @@ export default function LessonsPanel({
   completedLessons,
   selectedLesson,
   onSelectLesson,
-  loading = false
+  loading = false,
+  showStudentName = false
+
 }) {
+  console.log(completedLessons);
+
   const [tab, setTab] = useState('active');
   const list = tab === 'active' ? activeLessons : completedLessons;
 
@@ -19,10 +23,10 @@ export default function LessonsPanel({
 
     let dateStr = typeof date === 'string'
       ? new Date(date).toLocaleDateString('nl-NL', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        })
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
       : date;
 
     const formatTime = (timeStr) => {
@@ -81,13 +85,24 @@ export default function LessonsPanel({
             {list.map((les) => (
               <li
                 key={les.id}
-                className={`${styles.item} ${
-                  selectedLesson?.id === les.id ? styles.selected : ''
-                }`}
+                className={`${styles.item} ${selectedLesson?.id === les.id ? styles.selected : ''
+                  }`}
                 onClick={() => onSelectLesson(les)}
               >
-                <div className={styles.lessonInfo}>{formatEntry(les)}</div>
-
+                {/* <div className={styles.lessonTitle} title={les.student_name}>
+                  {les.student_name}
+                </div> */}
+                <div className={styles.lessonDetails}>
+                  {showStudentName && (
+                    <div
+                      className={styles.lessonTitle}
+                      title={les.studentName || les.student_name}
+                    >
+                      {les.studentName || les.student_name}
+                    </div>
+                  )}
+                  <div className={styles.lessonInfo}>{formatEntry(les)}</div>
+                </div>
                 <div className={styles.meta}>
                   <span className={tab === 'active' ? styles.badgeActive : styles.badgeDone}>
                     {tab === 'active' ? 'Actief' : 'Voltooid'}

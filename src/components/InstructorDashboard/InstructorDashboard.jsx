@@ -349,6 +349,7 @@ export default function InstructorDashboard() {
               }
             }}
             loading={isLoadingActiveLessons || isLoadingCompletedLessons}
+            showStudentName={selectedStudent?.id === 'all'}
           />
         </aside>
 

@@ -53,15 +53,15 @@ export async function stopLesson(lessonId) {
 
   const now = new Date();
 
-  const endTimeUtcIso = now.toISOString(); 
+  const endTimeUtcIso = now.toISOString();
 
   const [year, month, day] = lesson.date.split('-').map(Number);
   const [startHour, startMinute] = lesson.startTime.split(':').map(Number);
   const localStart = new Date(year, month - 1, day, startHour, startMinute);
-  const startTimeUtcIso = localStart.toISOString(); 
+  const startTimeUtcIso = localStart.toISOString();
 
   lesson.endTime = endTimeUtcIso;
- 
+
   const utcDateOnly = now.toISOString().slice(0, 10);
 
   const body = {
@@ -100,18 +100,21 @@ export async function getCompletedLessons(studentId) {
   if (!result.success) throw new Error(result.message || "Failed to fetch completed lessons");
 
   const lessonsArray = result.data?.data || [];
-  
+  console.log('Raw completed lessons result:', lessonsArray);
   // Get students to map student names properly
   const students = await getStudents();
-  
+
   return lessonsArray.map(lesson => {
     // Find the student name from the students array
-    const student = students.find(s => s.id === lesson.student_id);
-    
+    // const student = students.find(s => s.id === lesson.student_id);
+    const student = students.find(s =>
+      String(s.id) === String(lesson.student_id)
+    );
+
     return {
       id: lesson.id,
       studentId: lesson.student_id,
-      studentName: student ? student.name : 'Unknown Student',
+      studentName: student?.name ?? lesson.student_name ?? 'Unknown Student',
       date: lesson.date, // Keep as string for now
       startTime: lesson.start_time,
       endTime: lesson.end_time,
@@ -128,18 +131,18 @@ export async function getCompletedLessons(studentId) {
 export async function getLessonDetails(lessonId) {
   const options = { method: "GET", redirect: "follow" };
   const url = `${BASE_URL}/api/lessons_details?id=${lessonId}`;
-  
+
   try {
     const response = await fetchAPI(url, options);
     const result = await handleResponse(response);
-    
+
     if (!result.success) {
       throw new Error(result.message || "Failed to fetch lesson details");
     }
-    
+
     // Debug: Log the raw result to understand the API response structure
     console.log('Raw lesson details result:', result);
-    
+
     return result.data || result;
   } catch (error) {
     console.error('API call failed for lesson details:', error);
