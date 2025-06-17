@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-import StudentSelect from '../StudentSelect/StudentSelect';
+import StudentSelect from './StudentSelect/StudentSelect';
 import Header from '../Header/Header';
 import LessonsPanel from './LessonsPanel/LessonsPanel';
 import LessonDetail from './LessonDetail/LessonDetail';

@@ -1,4 +1,3 @@
-// src/components/InstructorDashboard/VideoUploadModal/VideoUploadModal.jsx
 import React, { useState } from 'react';
 import styles from './VideoUploadModal.module.css';
 
